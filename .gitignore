@@ -31,10 +31,10 @@
 /build/
 
 # Android related
-/android/
-/lib/services/constant.dart
-/assets/img/twin.png
-/assets/img/nodata.png
+# /android/
+# /lib/services/constant.dart
+# /assets/img/twin.png
+# /assets/img/nodata.png
 
 # Web related
 lib/generated_plugin_registrant.dart

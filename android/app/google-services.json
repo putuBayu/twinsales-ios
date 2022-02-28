@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "59847690844",
+    "firebase_url": "https://sales-b072f.firebaseio.com",
+    "project_id": "sales-b072f",
+    "storage_bucket": "sales-b072f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:59847690844:android:388ba69304f557859e3499",
+        "android_client_info": {
+          "package_name": "com.jangkar.sales"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "59847690844-lq2mpm4admku0dm2sumugeec0dd649mu.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.jangkar.sales",
+            "certificate_hash": "83a1e18ddca9b569b5990370ca0cc61973eb6074"
+          }
+        },
+        {
+          "client_id": "59847690844-kt42gdlalst9imqa644lrig2oi93gn26.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB2PuNVWzfUJHVazTrKpZXeW1IVv4Ke-FM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "59847690844-kt42gdlalst9imqa644lrig2oi93gn26.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
