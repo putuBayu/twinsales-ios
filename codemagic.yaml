@@ -1,0 +1,5 @@
+workflows:
+  workflow-name:
+    environment:
+      ndk: r22b
+      java: 1.8
