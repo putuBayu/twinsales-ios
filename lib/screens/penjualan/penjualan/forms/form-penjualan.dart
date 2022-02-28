@@ -6,7 +6,7 @@ import 'package:sales/screens/penjualan/penjualan/detail-penjualan-hari-ini.dart
 import 'package:sales/services/api/api.dart';
 import 'package:sales/services/v2/helper.dart';
 import 'package:sales/services/v3/helper.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+// import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 
 class FormPenjualan extends StatefulWidget {
@@ -43,9 +43,9 @@ class _FormPenjualanState extends State<FormPenjualan>
       dataKunjungan;
   Map dataOd;
   TabController tabController, kunjunganController;
-  LatLng currentLocation;
-  GoogleMapController _mapController;
-  GoogleMapController get mapController => _mapController;
+  // LatLng currentLocation;
+  // GoogleMapController _mapController;
+  // GoogleMapController get mapController => _mapController;
   String fullAddress;
 
   //mitra
@@ -372,34 +372,35 @@ class _FormPenjualanState extends State<FormPenjualan>
     }
   }
 
-  onCreated(GoogleMapController controller) {
-    _mapController = controller;
+  onCreated() {
+    // _mapController = controller;
   }
 
-  onCameraMove(CameraPosition position) async {
+  onCameraMove() async {
     setState(() {});
     showLabel = false;
-    currentLocation =
-        LatLng(position.target.latitude, position.target.longitude);
+    // currentLocation =
+    //     LatLng(position.target.latitude, position.target.longitude);
   }
 
   getMoveCamera() async {
     showLabel = false;
-    List<Placemark> placemark = await Geolocator().placemarkFromCoordinates(
-        currentLocation.latitude, currentLocation.longitude);
-    locationController.text = placemark[0].thoroughfare.toString();
+    // List<Placemark> placemark = await Geolocator().placemarkFromCoordinates(
+    //     currentLocation.latitude, currentLocation.longitude);
+    // locationController.text = placemark[0].thoroughfare.toString();
     setState(() {
-      fullAddress = placemark[0].thoroughfare.toString() +
-          ', ' +
-          placemark[0].subLocality.toString() +
-          ', ' +
-          placemark[0].locality.toString() +
-          ', ' +
-          placemark[0].subAdministrativeArea.toString() +
-          ', ' +
-          placemark[0].administrativeArea.toString() +
-          ', ' +
-          placemark[0].postalCode.toString();
+      fullAddress = '';
+      // placemark[0].thoroughfare.toString() +
+      //     ', ' +
+      //     placemark[0].subLocality.toString() +
+      //     ', ' +
+      //     placemark[0].locality.toString() +
+      //     ', ' +
+      //     placemark[0].subAdministrativeArea.toString() +
+      //     ', ' +
+      //     placemark[0].administrativeArea.toString() +
+      //     ', ' +
+      //     placemark[0].postalCode.toString();
 
       showLabel = true;
     });
@@ -421,9 +422,9 @@ class _FormPenjualanState extends State<FormPenjualan>
           getGps: true,
           then: (res) {
             if (res['enabled']) {
-              currentLocation = LatLng(
-                  double.parse(res['position'].latitude.toString()),
-                  double.parse(res['position'].longitude.toString()));
+              // currentLocation = LatLng(
+              //     double.parse(res['position'].latitude.toString()),
+              //     double.parse(res['position'].longitude.toString()));
             } else {
               Wh.alert(context,
                   icon: Ic.gps(),
@@ -434,8 +435,7 @@ class _FormPenjualanState extends State<FormPenjualan>
       // currentLocation = LatLng(position.latitude, position.longitude);
     } else {
       // print(widget.initData);
-      currentLocation = LatLng(widget.initDataKunjungan['latitude'],
-          widget.initDataKunjungan['longitude']);
+      // currentLocation = LatLng(widget.initDataKunjungan['latitude'],widget.initDataKunjungan['longitude']);
     }
   }
 
