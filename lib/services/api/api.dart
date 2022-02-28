@@ -269,52 +269,56 @@ onError(context,
 
   switch (status) {
     case 403:
-      if (popup) {
-        showDialog(
-          context: context,
-          // child: ErrorPopup(status: status, message: message)
-        ).then((_) {
-          if (backOnDismiss) {
-            Navigator.pop(context);
-          }
-        });
-      } else {
-        Wh.toast(status.toString() + ' - ' + message);
-      }
+      print('error');
+      // if (popup) {
+      //   showDialog(
+      //     context: context,
+      //     // child: ErrorPopup(status: status, message: message)
+      //   ).then((_) {
+      //     if (backOnDismiss) {
+      //       Navigator.pop(context);
+      //     }
+      //   });
+      // } else {
+      //   Wh.toast(status.toString() + ' - ' + message);
+      // }
       break;
 
     case 404:
-      if (popup) {
-        showDialog(
-          context: context,
-          // child: ErrorPopup(status: status, message: message)
-        ).then((_) {
-          if (backOnDismiss) {
-            Navigator.pop(context);
-          }
-        });
-      } else {
-        Wh.toast(message);
-      }
+      print('error');
+      // if (popup) {
+      //   showDialog(
+      //     context: context,
+      //     // child: ErrorPopup(status: status, message: message)
+      //   ).then((_) {
+      //     if (backOnDismiss) {
+      //       Navigator.pop(context);
+      //     }
+      //   });
+      // } else {
+      //   Wh.toast(message);
+      // }
       break;
 
     case 500:
-      showDialog(
-              context: context,
-              child: ErrorPopup(
-                  status: status,
-                  icon: Feather.server,
-                  message: 'Internal server error!'))
-          .then((_) {
-        if (backOnDismiss) {
-          Navigator.pop(context);
-        }
-        if (then != null) then(status);
-      });
+      print('error');
+      // showDialog(
+      //         context: context,
+      //         // child: ErrorPopup(
+      //         //     status: status,
+      //         //     icon: Feather.server,
+      //         //     message: 'Internal server error!'))
+      //     .then((_) {
+      //   if (backOnDismiss) {
+      //     Navigator.pop(context);
+      //   }
+      //   if (then != null) then(status);
+      // });
       break;
 
     case 401:
-      Wh.toast('Session expired, coba login ulang.');
+      print('error');
+      // Wh.toast('Session expired, coba login ulang.');
       break;
 
     default: //Wh.toast(status.toString()+' - Unknown Error'); print(response['body']);
