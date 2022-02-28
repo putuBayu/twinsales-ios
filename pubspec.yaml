@@ -53,7 +53,7 @@ dev_dependencies:
   ntp: ^1.0.8
   multi_sort: ^3.0.0
   dart_ping: ^3.0.0
-  month_picker_dialog: 0.3.3
+  # month_picker_dialog: 0.3.3
 
 
 
