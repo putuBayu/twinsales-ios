@@ -17,8 +17,8 @@
         android:label="Twin Sales"
         android:icon="@drawable/logo">
 
-        <meta-data android:name="${applicationName}"
-            android:value="AIzaSyCmUwC9e4Ps59PBzAPa2u6MDrWZEqow0Lw"/>
+        <!-- <meta-data android:name="${applicationName}"
+            android:value="AIzaSyCmUwC9e4Ps59PBzAPa2u6MDrWZEqow0Lw"/> -->
 
         <activity
             android:name=".MainActivity"
