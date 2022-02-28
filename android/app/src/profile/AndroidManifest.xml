@@ -13,12 +13,12 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
 
     <application
-        android:name="io.flutter.app.FlutterApplication"
+        android:name="${applicationName}"
         android:label="Twin Sales"
         android:icon="@drawable/logo">
 
-        <!-- <meta-data android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyCmUwC9e4Ps59PBzAPa2u6MDrWZEqow0Lw"/> -->
+        <meta-data android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyCmUwC9e4Ps59PBzAPa2u6MDrWZEqow0Lw"/>
 
         <activity
             android:name=".MainActivity"
