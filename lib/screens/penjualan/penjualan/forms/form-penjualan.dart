@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+// import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:sales/screens/penjualan/penjualan/detail-penjualan-hari-ini.dart';
 import 'package:sales/services/api/api.dart';
 import 'package:sales/services/v2/helper.dart';
@@ -17,7 +17,8 @@ class FormPenjualan extends StatefulWidget {
   _FormPenjualanState createState() => _FormPenjualanState();
 }
 
-class _FormPenjualanState extends State<FormPenjualan> with TickerProviderStateMixin {
+class _FormPenjualanState extends State<FormPenjualan>
+    with TickerProviderStateMixin {
   Timer pingLooper;
 
   var toko = TextEditingController(),
@@ -32,8 +33,14 @@ class _FormPenjualanState extends State<FormPenjualan> with TickerProviderStateM
       tipeHarga = TextEditingController();
 
   var initData = {}, isSubmit = false, idToko = 0;
-  var selected = 0, loading = true, loadKunjungan = true, showLabel = false, loadOD = false;
-  List dataTipeHarga, dataTipeKunjungan = ['Efektif', 'Tidak Efektif'], dataKunjungan;
+  var selected = 0,
+      loading = true,
+      loadKunjungan = true,
+      showLabel = false,
+      loadOD = false;
+  List dataTipeHarga,
+      dataTipeKunjungan = ['Efektif', 'Tidak Efektif'],
+      dataKunjungan;
   Map dataOd;
   TabController tabController, kunjunganController;
   LatLng currentLocation;
@@ -47,15 +54,15 @@ class _FormPenjualanState extends State<FormPenjualan> with TickerProviderStateM
   String selectedMitra = '0';
   // int selectedIdMitra = 0;
 
-  getMitra({refill: false}) async{
-    getPrefs('mitra', dec: true).then((res) async{
-      if(!refill && res != null){
+  getMitra({refill: false}) async {
+    getPrefs('mitra', dec: true).then((res) async {
+      if (!refill && res != null) {
         mitraValue = res;
         loading = false;
         initForm();
-      }else{
-        await Request.get('/mitra/list/simple', then: (status, body){
-          if(mounted){
+      } else {
+        await Request.get('/mitra/list/simple', then: (status, body) {
+          if (mounted) {
             Map res = decode(body);
             loading = false;
 
@@ -76,8 +83,10 @@ class _FormPenjualanState extends State<FormPenjualan> with TickerProviderStateM
 
             return res;
           }
-        }, error: (err){
-          setState(() { loading = false; });
+        }, error: (err) {
+          setState(() {
+            loading = false;
+          });
           onError(context, response: err);
         });
       }
@@ -85,15 +94,17 @@ class _FormPenjualanState extends State<FormPenjualan> with TickerProviderStateM
   }
 
   getTipeHarga({refill: false}) async {
-    setState(() { loading = true; });
+    setState(() {
+      loading = true;
+    });
 
-    getPrefs('tipeHarga', dec: true).then((res)async{
-      if(!refill && res != null){
+    getPrefs('tipeHarga', dec: true).then((res) async {
+      if (!refill && res != null) {
         dataTipeHarga = res;
         getMitra();
-      }else{
-        await Request.get('/tipe_harga/get/list', then: (status, body){
-          if(mounted){
+      } else {
+        await Request.get('/tipe_harga/get/list', then: (status, body) {
+          if (mounted) {
             List res = decode(body);
             // loading = false;
 
@@ -107,20 +118,23 @@ class _FormPenjualanState extends State<FormPenjualan> with TickerProviderStateM
 
             return res;
           }
-        }, error: (err){
-          setState(() { loading = false; });
+        }, error: (err) {
+          setState(() {
+            loading = false;
+          });
           onError(context, response: err);
         });
       }
     });
   }
 
-  getLimitOd()async{
+  getLimitOd() async {
     setState(() {
       loadOD = true;
     });
-    await Request.get('/toko/sisa_limit_od/' + idToko.toString(), then: (status, body){
-      if(mounted){
+    await Request.get('/toko/sisa_limit_od/' + idToko.toString(),
+        then: (status, body) {
+      if (mounted) {
         Map res = decode(body);
 
         setState(() {
@@ -130,120 +144,158 @@ class _FormPenjualanState extends State<FormPenjualan> with TickerProviderStateM
 
         return res;
       }
-    }, error: (err){
-      setState(() { loading = false; });
+    }, error: (err) {
+      setState(() {
+        loading = false;
+      });
       onError(context, response: err);
     });
   }
-  
-  Widget detailOD(){
-    return loadOD ? ListSkeleton(length: 5,) : Container(
-      height: dataOd['od'].length <= 0 ? 100 : Mquery.height(context)*0.6,
-      child: Column(
-        children: [
-          Expanded(
-            child: dataOd['od'].length <= 0 ? Center(
-              child: text('Tidak ada invoice yang OD'),
-            ) : SingleChildScrollView(
-              child: Column(
-                children: List.generate(dataOd['od'].length, (i){
-                  var data = dataOd['od'][i];
-                  return WidSplash(
-                    color: i % 2 == 0 ? TColor.silver() : Colors.white,
-                    child: Container(
-                      padding: EdgeInsets.all(15),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          text(data['invoice'], bold: true),
-                          Row(
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  text('Due Date', size: 13),
-                                  text('Grand Total', size: 13),
-                                ],
-                              ),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    text(' : ' + data['due_date'], size: 13),
-                                    text(' : ' + ribuan(data['grand_total'], cur: 'Rp '), size: 13),
-                                  ],
-                                ),
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  text('OD', size: 13),
-                                  text('Umur', size: 13)
-                                ],
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  text(' : ' + data['over_due'].toString() + ' hari', size: 13),
-                                  text(' : ' + data['umur'].toString() + ' hari', size: 13)
-                                ],
-                              )
-                            ],
-                          )
-                        ],
-                      ),
-                    ),
-                  );
-                }),
-              ),
-            ),
-          ),
-          Container(
-            margin: EdgeInsets.all(10),
-            child: WidSplash(
-              border: Border.all(color: Colors.black26),
-              onTap: (){ Navigator.pop(context); },
-              color: Color.fromRGBO(0, 0, 0, .03),
-              radius: BorderRadius.circular(5),
-              child: Container(
-                width: Mquery.width(context),
-                padding: EdgeInsets.all(11),
-                child: text('Tutup', align: TextAlign.center),
-              ),
-            ),
+
+  Widget detailOD() {
+    return loadOD
+        ? ListSkeleton(
+            length: 5,
           )
-        ],
-      ),
-    );
+        : Container(
+            height:
+                dataOd['od'].length <= 0 ? 100 : Mquery.height(context) * 0.6,
+            child: Column(
+              children: [
+                Expanded(
+                  child: dataOd['od'].length <= 0
+                      ? Center(
+                          child: text('Tidak ada invoice yang OD'),
+                        )
+                      : SingleChildScrollView(
+                          child: Column(
+                            children: List.generate(dataOd['od'].length, (i) {
+                              var data = dataOd['od'][i];
+                              return WidSplash(
+                                color:
+                                    i % 2 == 0 ? TColor.silver() : Colors.white,
+                                child: Container(
+                                  padding: EdgeInsets.all(15),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                      text(data['invoice'], bold: true),
+                                      Row(
+                                        children: [
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              text('Due Date', size: 13),
+                                              text('Grand Total', size: 13),
+                                            ],
+                                          ),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                text(' : ' + data['due_date'],
+                                                    size: 13),
+                                                text(
+                                                    ' : ' +
+                                                        ribuan(
+                                                            data['grand_total'],
+                                                            cur: 'Rp '),
+                                                    size: 13),
+                                              ],
+                                            ),
+                                          ),
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              text('OD', size: 13),
+                                              text('Umur', size: 13)
+                                            ],
+                                          ),
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              text(
+                                                  ' : ' +
+                                                      data['over_due']
+                                                          .toString() +
+                                                      ' hari',
+                                                  size: 13),
+                                              text(
+                                                  ' : ' +
+                                                      data['umur'].toString() +
+                                                      ' hari',
+                                                  size: 13)
+                                            ],
+                                          )
+                                        ],
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              );
+                            }),
+                          ),
+                        ),
+                ),
+                Container(
+                  margin: EdgeInsets.all(10),
+                  child: WidSplash(
+                    border: Border.all(color: Colors.black26),
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                    color: Color.fromRGBO(0, 0, 0, .03),
+                    radius: BorderRadius.circular(5),
+                    child: Container(
+                      width: Mquery.width(context),
+                      padding: EdgeInsets.all(11),
+                      child: text('Tutup', align: TextAlign.center),
+                    ),
+                  ),
+                )
+              ],
+            ),
+          );
   }
 
-  getKunjungan(){
+  getKunjungan() {
     setState(() {
       loadKunjungan = true;
     });
-    Request.get('/options/get/list?code=call', then: (status, body){
-      if(mounted){
+    Request.get('/options/get/list?code=call', then: (status, body) {
+      if (mounted) {
         var res = decode(body);
 
         setState(() {
           dataKunjungan = res['data'];
-          if(widget.initDataKunjungan == null){
-            listKunjungan.text = dataKunjungan[dataKunjungan.length-1]['value'];
+          if (widget.initDataKunjungan == null) {
+            listKunjungan.text =
+                dataKunjungan[dataKunjungan.length - 1]['value'];
           }
         });
         loadKunjungan = false;
 
-        kunjunganController = new TabController(length: dataKunjungan.length, vsync: this);
-        kunjunganController.addListener(() {TColor.azure();});
+        kunjunganController =
+            new TabController(length: dataKunjungan.length, vsync: this);
+        kunjunganController.addListener(() {
+          TColor.azure();
+        });
 
         setState(() {
-          kunjunganController.index = dataKunjungan.length-1;
+          kunjunganController.index = dataKunjungan.length - 1;
         });
 
         return res;
       }
-    }, error: (err){
-      setState(() { loading = false; });
+    }, error: (err) {
+      setState(() {
+        loading = false;
+      });
       onError(context, response: err);
     });
   }
@@ -256,16 +308,18 @@ class _FormPenjualanState extends State<FormPenjualan> with TickerProviderStateM
       idToko = int.parse(data['id_toko']);
       // selectedIdMitra = data['id_mitra'];
       // selectedMitra = mitraValue[data['id_mitra']];
-      for(int i=0; i<mitraValue.length; i++){
-        if(mitraValue[i]['id'].toString().toLowerCase() == data['id_mitra'].toString().toLowerCase()){
+      for (int i = 0; i < mitraValue.length; i++) {
+        if (mitraValue[i]['id'].toString().toLowerCase() ==
+            data['id_mitra'].toString().toLowerCase()) {
           setState(() {
             selectedMitra = mitraValue[i]['id'].toString();
           });
         }
       }
 
-      for(int i = 0; i < dataTipeHarga.length; i++){
-        if(dataTipeHarga[i].toString().toLowerCase() == data['tipe_harga'].toString().toLowerCase()){
+      for (int i = 0; i < dataTipeHarga.length; i++) {
+        if (dataTipeHarga[i].toString().toLowerCase() ==
+            data['tipe_harga'].toString().toLowerCase()) {
           setState(() {
             tipeHarga.text = data['tipe_harga'];
             selected = i;
@@ -282,9 +336,9 @@ class _FormPenjualanState extends State<FormPenjualan> with TickerProviderStateM
         poManual.text = data['po_manual'];
         keterangan.text = data['keterangan'];
       });
-    } else if(widget.initDataKunjungan != null){
+    } else if (widget.initDataKunjungan != null) {
       var data = widget.initDataKunjungan;
-      if(data != null){
+      if (data != null) {
         toko.text = data['nama_toko'];
         idToko = data['id_toko'];
         listKunjungan.text = data['status'].toString().toLowerCase();
@@ -306,9 +360,10 @@ class _FormPenjualanState extends State<FormPenjualan> with TickerProviderStateM
     }
   }
 
-  selectedPrice(var data){
-    for(int i=0; i<dataTipeHarga.length; i++){
-      if(dataTipeHarga[i].toString().toLowerCase() == data.toString().toLowerCase()){
+  selectedPrice(var data) {
+    for (int i = 0; i < dataTipeHarga.length; i++) {
+      if (dataTipeHarga[i].toString().toLowerCase() ==
+          data.toString().toLowerCase()) {
         setState(() {
           selected = i;
           tipeHarga.text = dataTipeHarga[i].toString().toLowerCase();
@@ -317,27 +372,34 @@ class _FormPenjualanState extends State<FormPenjualan> with TickerProviderStateM
     }
   }
 
-  onCreated(GoogleMapController controller){
+  onCreated(GoogleMapController controller) {
     _mapController = controller;
   }
 
-  onCameraMove(CameraPosition position) async{
+  onCameraMove(CameraPosition position) async {
     setState(() {});
     showLabel = false;
-    currentLocation = LatLng(position.target.latitude, position.target.longitude);
+    currentLocation =
+        LatLng(position.target.latitude, position.target.longitude);
   }
 
-  getMoveCamera() async{
+  getMoveCamera() async {
     showLabel = false;
-    List<Placemark> placemark = await Geolocator().placemarkFromCoordinates(currentLocation.latitude, currentLocation.longitude);
+    List<Placemark> placemark = await Geolocator().placemarkFromCoordinates(
+        currentLocation.latitude, currentLocation.longitude);
     locationController.text = placemark[0].thoroughfare.toString();
     setState(() {
-      fullAddress = placemark[0].thoroughfare.toString()
-          + ', ' + placemark[0].subLocality.toString()
-          + ', ' + placemark[0].locality.toString()
-          + ', ' + placemark[0].subAdministrativeArea.toString()
-          + ', ' + placemark[0].administrativeArea.toString()
-          + ', ' + placemark[0].postalCode.toString();
+      fullAddress = placemark[0].thoroughfare.toString() +
+          ', ' +
+          placemark[0].subLocality.toString() +
+          ', ' +
+          placemark[0].locality.toString() +
+          ', ' +
+          placemark[0].subAdministrativeArea.toString() +
+          ', ' +
+          placemark[0].administrativeArea.toString() +
+          ', ' +
+          placemark[0].postalCode.toString();
 
       showLabel = true;
     });
@@ -351,25 +413,29 @@ class _FormPenjualanState extends State<FormPenjualan> with TickerProviderStateM
   //   _mapController.animateCamera(CameraUpdate.newLatLng(currentLocation));
   // }
 
-  initLocation() async{
-    if(widget.initDataKunjungan == null){
+  initLocation() async {
+    if (widget.initDataKunjungan == null) {
       // Position position = await Geolocator().getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
       // print(position.longitude.toString());
-      isEnabledLocation(getGps: true,then: (res){
-        if(res['enabled']){
-          currentLocation = LatLng(double.parse(res['position'].latitude.toString()), double.parse(res['position'].longitude.toString()));
-        }else{
-          Wh.alert(
-              context,
-              icon: Ic.gps(),
-              message: 'Hidupkan GPS atau lokasi Anda untuk dapat menambahkan data penjualan.'
-          );
-        }
-      });
+      isEnabledLocation(
+          getGps: true,
+          then: (res) {
+            if (res['enabled']) {
+              currentLocation = LatLng(
+                  double.parse(res['position'].latitude.toString()),
+                  double.parse(res['position'].longitude.toString()));
+            } else {
+              Wh.alert(context,
+                  icon: Ic.gps(),
+                  message:
+                      'Hidupkan GPS atau lokasi Anda untuk dapat menambahkan data penjualan.');
+            }
+          });
       // currentLocation = LatLng(position.latitude, position.longitude);
-    }else{
+    } else {
       // print(widget.initData);
-      currentLocation = LatLng(widget.initDataKunjungan['latitude'], widget.initDataKunjungan['longitude']);
+      currentLocation = LatLng(widget.initDataKunjungan['latitude'],
+          widget.initDataKunjungan['longitude']);
     }
   }
 
@@ -389,9 +455,11 @@ class _FormPenjualanState extends State<FormPenjualan> with TickerProviderStateM
       });
     });
 
-
-    tabController = new TabController(length: dataTipeKunjungan.length, vsync: this);
-    tabController.addListener(() {TColor.azure();});
+    tabController =
+        new TabController(length: dataTipeKunjungan.length, vsync: this);
+    tabController.addListener(() {
+      TColor.azure();
+    });
   }
 
   @override
@@ -430,19 +498,26 @@ class _FormPenjualanState extends State<FormPenjualan> with TickerProviderStateM
                   'id_mitra': selectedMitra.toString()
                 };
 
-                Request.post('penjualan', formData: formData, then: (status, data) {
+                Request.post('penjualan', formData: formData,
+                    then: (status, data) {
                   Map res = decode(data); // data penjualan yang ditambahkan
 
                   removePrefs(list: ['activities']); // reset activity
                   Wh.toast(res['message']);
 
-                  modal(widget.ctx, child: DetailPenjualanHariIni(ctx: widget.ctx, dataPenjualan: res['data'][0]), then: (_) {
+                  modal(widget.ctx,
+                      child: DetailPenjualanHariIni(
+                          ctx: widget.ctx,
+                          dataPenjualan: res['data'][0]), then: (_) {
                     statusBar(color: Colors.transparent, darkText: false);
                     Navigator.pop(context);
                   });
 
                   // trigger firebase
-                  Firestore.instance.collection('trigger_sales').document('penjualan').updateData({'trigger': timestamp().toString()});
+                  // Firestore.instance
+                  //     .collection('trigger_sales')
+                  //     .document('penjualan')
+                  //     .updateData({'trigger': timestamp().toString()});
                 }, error: (err) {
                   onError(context, response: err, popup: true);
                   setState(() => isSubmit = false);
@@ -458,7 +533,8 @@ class _FormPenjualanState extends State<FormPenjualan> with TickerProviderStateM
                   'keterangan': keterangan.text,
                 };
 
-                Request.put('penjualan/' + initData['id'].toString(), formData: formData, then: (status, body) {
+                Request.put('penjualan/' + initData['id'].toString(),
+                    formData: formData, then: (status, body) {
                   Map res = decode(body);
                   // update initData
                   widget.initData['tipe_pembayaran'] = tipePembayaran.text;
@@ -478,14 +554,12 @@ class _FormPenjualanState extends State<FormPenjualan> with TickerProviderStateM
               setState(() {
                 isSubmit = false;
               });
-              Wh.alert(
-                  context,
+              Wh.alert(context,
                   icon: Ic.gps(),
-                  message: 'Hidupkan GPS atau lokasi Anda untuk dapat menambahkan data penjualan.'
-              );
+                  message:
+                      'Hidupkan GPS atau lokasi Anda untuk dapat menambahkan data penjualan.');
             }
-          }
-      );
+          });
     }
   }
 
@@ -554,274 +628,298 @@ class _FormPenjualanState extends State<FormPenjualan> with TickerProviderStateM
         backgroundColor: TColor.silver(),
         appBar: Wh.appBar(
           context,
-          title: widget.initData != null ? 'Edit Penjualan'
-              : widget.initDataKunjungan != null ? 'Edit Kunjungan'
-              : tipeKunjungan.text == 'Efektif' ? 'Penjualan Baru' : 'Buat Kunjungan',
+          title: widget.initData != null
+              ? 'Edit Penjualan'
+              : widget.initDataKunjungan != null
+                  ? 'Edit Kunjungan'
+                  : tipeKunjungan.text == 'Efektif'
+                      ? 'Penjualan Baru'
+                      : 'Buat Kunjungan',
           center: true,
           actions: [
             Padding(
                 padding: const EdgeInsets.only(left: 5.0),
-                child: pingStyle(CheckPing().getTimeRespond())
-            ),
+                child: pingStyle(CheckPing().getTimeRespond())),
             IconButton(
-              icon: Icon(Ic.refresh(), size: 20,
-                  color: loading ? Colors.black38 : Colors.black54
-              ),
-              onPressed: loading ? null : () {
-                getTipeHarga(refill: true);
-              },
+              icon: Icon(Ic.refresh(),
+                  size: 20, color: loading ? Colors.black38 : Colors.black54),
+              onPressed: loading
+                  ? null
+                  : () {
+                      getTipeHarga(refill: true);
+                    },
             ),
           ],
         ),
-        body: loading? ListSkeleton(length: 10,) : PreventScrollGlow(
-          child: Column(
-            children: <Widget>[
-              // widget.initData != null || widget.initDataKunjungan != null ? SizedBox.shrink() : TabBar(
-              //   unselectedLabelStyle: TextStyle(fontWeight: FontWeight.normal),
-              //   isScrollable: false,
-              //   labelPadding: EdgeInsets.zero,
-              //   labelColor: TColor.azure(),
-              //   indicatorWeight: 2,
-              //   indicatorColor: TColor.azure(),
-              //   controller: tabController,
-              //   tabs: List.generate(dataTipeKunjungan.length, (i){
-              //     var data = dataTipeKunjungan[i];
-              //     return Center(
-              //       child: WidSplash(
-              //           onTap: (){
-              //             setState(() {
-              //               tabController.index = i;
-              //               tipeKunjungan.text = data;
-              //             });
-              //           },
-              //           color: Colors.white,
-              //           padding: EdgeInsets.symmetric(vertical: 10),
-              //           child: Container(
-              //               width: Mquery.width(context)/dataTipeKunjungan.length,
-              //               child: text(data,
-              //                   align: TextAlign.center,
-              //                   color: tabController.index == i ? TColor.azure() : Colors.black54,
-              //                   bold: tabController.index == i ? true : false
-              //               )
-              //           )
-              //       ),
-              //     );
-              //   }),
-              // ),
-              // tabController.index == 0 ? SizedBox.shrink() : SlideDown(
-              //   child: Container(
-              //     color: TColor.gray(o: 0.5),
-              //     margin: EdgeInsets.only(bottom: 5),
-              //     width: Mquery.width(context),
-              //     height: 150,
-              //     child: Stack(
-              //       children: [
-              //         currentLocation == null ? SizedBox.shrink() : GoogleMap(
-              //           initialCameraPosition: CameraPosition(
-              //               target: currentLocation,
-              //               zoom: 15
-              //           ),
-              //           zoomControlsEnabled: true,
-              //           myLocationEnabled: true,
-              //           myLocationButtonEnabled: false,
-              //           onCameraMove: onCameraMove,
-              //           onMapCreated: onCreated,
-              //           onCameraIdle: (){
-              //             setState(() {
-              //               getMoveCamera();
-              //               showLabel = true;
-              //             });
-              //             // getUserLocation();
-              //           },
-              //         ),
-              //         Align(
-              //           alignment: Alignment.center,
-              //           child: Container(
-              //             margin: EdgeInsets.only(bottom: 45),
-              //             child: ClipRRect(
-              //                 borderRadius: BorderRadius.circular(20),
-              //                 child: Image.asset('assets/img/marker.png', height: 40, color: TColor.azure(),)
-              //             ),
-              //           ),
-              //         ),
-              //         Align(
-              //           alignment: Alignment.center,
-              //           child: Container(
-              //             margin: EdgeInsets.only(bottom: 55),
-              //             child: ClipRRect(
-              //                 borderRadius: BorderRadius.circular(20),
-              //                 child: Image.asset('assets/img/profile.png', height: 25,)
-              //             ),
-              //           ),
-              //         ),
-              //       ],
-              //     ),
-              //   ),
-              // ),
-              Expanded(
-                child: SingleChildScrollView(
-                  padding: EdgeInsets.all(15),
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        tabController.index != 1 ? SizedBox.shrink() : !showLabel ? ListSkeleton(length: 1, type: 'text',) : Container(
-                          margin: EdgeInsets.only(bottom: 15),
-                          child: text(fullAddress, color: Colors.black87, size: 16),
-                        ),
-                        Dropdown(
-                          values: selectedMitra,
-                          space: 15,
-                          label: 'Mitra',
-                          hint: 'Pilih Mitra',
-                          item: mitraValue.map((value){
-                            return DropdownMenuItem<String>(
-                              child: value['kode_mitra'] == null || value['kode_mitra'] == ''
-                                ? text(value['perusahaan'])
-                                : text(value['kode_mitra'] + ' - ' + value['perusahaan']),
-                              value: value['id'].toString(),
-                            );
-                          }).toList(),
-                          onChanged: (value){
-                            if(widget.initData != null){
-                              Wh.toast('Tidak dapat mengedit mitra');
-                            }else{
-                              setState(() {
-                                selectedMitra = value;
-                                for(int i = 0; i < mitraValue.length; i++){
-                                  if(mitraValue[i]['id'].toString() == value.toString()){
+        body: loading
+            ? ListSkeleton(
+                length: 10,
+              )
+            : PreventScrollGlow(
+                child: Column(
+                  children: <Widget>[
+                    // widget.initData != null || widget.initDataKunjungan != null ? SizedBox.shrink() : TabBar(
+                    //   unselectedLabelStyle: TextStyle(fontWeight: FontWeight.normal),
+                    //   isScrollable: false,
+                    //   labelPadding: EdgeInsets.zero,
+                    //   labelColor: TColor.azure(),
+                    //   indicatorWeight: 2,
+                    //   indicatorColor: TColor.azure(),
+                    //   controller: tabController,
+                    //   tabs: List.generate(dataTipeKunjungan.length, (i){
+                    //     var data = dataTipeKunjungan[i];
+                    //     return Center(
+                    //       child: WidSplash(
+                    //           onTap: (){
+                    //             setState(() {
+                    //               tabController.index = i;
+                    //               tipeKunjungan.text = data;
+                    //             });
+                    //           },
+                    //           color: Colors.white,
+                    //           padding: EdgeInsets.symmetric(vertical: 10),
+                    //           child: Container(
+                    //               width: Mquery.width(context)/dataTipeKunjungan.length,
+                    //               child: text(data,
+                    //                   align: TextAlign.center,
+                    //                   color: tabController.index == i ? TColor.azure() : Colors.black54,
+                    //                   bold: tabController.index == i ? true : false
+                    //               )
+                    //           )
+                    //       ),
+                    //     );
+                    //   }),
+                    // ),
+                    // tabController.index == 0 ? SizedBox.shrink() : SlideDown(
+                    //   child: Container(
+                    //     color: TColor.gray(o: 0.5),
+                    //     margin: EdgeInsets.only(bottom: 5),
+                    //     width: Mquery.width(context),
+                    //     height: 150,
+                    //     child: Stack(
+                    //       children: [
+                    //         currentLocation == null ? SizedBox.shrink() : GoogleMap(
+                    //           initialCameraPosition: CameraPosition(
+                    //               target: currentLocation,
+                    //               zoom: 15
+                    //           ),
+                    //           zoomControlsEnabled: true,
+                    //           myLocationEnabled: true,
+                    //           myLocationButtonEnabled: false,
+                    //           onCameraMove: onCameraMove,
+                    //           onMapCreated: onCreated,
+                    //           onCameraIdle: (){
+                    //             setState(() {
+                    //               getMoveCamera();
+                    //               showLabel = true;
+                    //             });
+                    //             // getUserLocation();
+                    //           },
+                    //         ),
+                    //         Align(
+                    //           alignment: Alignment.center,
+                    //           child: Container(
+                    //             margin: EdgeInsets.only(bottom: 45),
+                    //             child: ClipRRect(
+                    //                 borderRadius: BorderRadius.circular(20),
+                    //                 child: Image.asset('assets/img/marker.png', height: 40, color: TColor.azure(),)
+                    //             ),
+                    //           ),
+                    //         ),
+                    //         Align(
+                    //           alignment: Alignment.center,
+                    //           child: Container(
+                    //             margin: EdgeInsets.only(bottom: 55),
+                    //             child: ClipRRect(
+                    //                 borderRadius: BorderRadius.circular(20),
+                    //                 child: Image.asset('assets/img/profile.png', height: 25,)
+                    //             ),
+                    //           ),
+                    //         ),
+                    //       ],
+                    //     ),
+                    //   ),
+                    // ),
+                    Expanded(
+                      child: SingleChildScrollView(
+                        padding: EdgeInsets.all(15),
+                        child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              tabController.index != 1
+                                  ? SizedBox.shrink()
+                                  : !showLabel
+                                      ? ListSkeleton(
+                                          length: 1,
+                                          type: 'text',
+                                        )
+                                      : Container(
+                                          margin: EdgeInsets.only(bottom: 15),
+                                          child: text(fullAddress,
+                                              color: Colors.black87, size: 16),
+                                        ),
+                              Dropdown(
+                                values: selectedMitra,
+                                space: 15,
+                                label: 'Mitra',
+                                hint: 'Pilih Mitra',
+                                item: mitraValue.map((value) {
+                                  return DropdownMenuItem<String>(
+                                    child: value['kode_mitra'] == null ||
+                                            value['kode_mitra'] == ''
+                                        ? text(value['perusahaan'])
+                                        : text(value['kode_mitra'] +
+                                            ' - ' +
+                                            value['perusahaan']),
+                                    value: value['id'].toString(),
+                                  );
+                                }).toList(),
+                                onChanged: (value) {
+                                  if (widget.initData != null) {
+                                    Wh.toast('Tidak dapat mengedit mitra');
+                                  } else {
                                     setState(() {
-                                      selectedMitra = i.toString();
-                                      print(selectedMitra);
+                                      selectedMitra = value;
+                                      for (int i = 0;
+                                          i < mitraValue.length;
+                                          i++) {
+                                        if (mitraValue[i]['id'].toString() ==
+                                            value.toString()) {
+                                          setState(() {
+                                            selectedMitra = i.toString();
+                                            print(selectedMitra);
+                                          });
+                                        }
+                                      }
                                     });
                                   }
-                                }
-                              });
-                            }
-                          },
-                        ),
-                        SelectInput(
-                          space: 15,
-                          label: 'Pilih Toko',
-                          hint: 'Pilih toko',
-                          controller: toko,
-                          enabled: widget.initData == null ? true : false,
-                          select: () {
-                            modal(widget.ctx, radius: 5, child: DaftarToko(), then: (res) {
-                              if (res != null){
-                                setState(() {
-                                  toko.text = res['toko'];
-                                  idToko = res['id'];
-                                });
-                                selectedPrice(res['tipe_harga']);
-                                // getLimitOd();
-                              }
-                            });
-                          },
-                        ),
+                                },
+                              ),
+                              SelectInput(
+                                space: 15,
+                                label: 'Pilih Toko',
+                                hint: 'Pilih toko',
+                                controller: toko,
+                                enabled: widget.initData == null ? true : false,
+                                select: () {
+                                  modal(widget.ctx,
+                                      radius: 5,
+                                      child: DaftarToko(), then: (res) {
+                                    if (res != null) {
+                                      setState(() {
+                                        toko.text = res['toko'];
+                                        idToko = res['id'];
+                                      });
+                                      selectedPrice(res['tipe_harga']);
+                                      // getLimitOd();
+                                    }
+                                  });
+                                },
+                              ),
 
-                        // tabController.index == 1 || dataOd == null ? SizedBox.shrink() : loadOD ? ListSkeleton(length: 1,) : SelectInput(
-                        //   space: 15,
-                        //   label: 'Informasi Credit',
-                        //   controller: infoOD,
-                        //   select: (){
-                        //     Wh.dialog(context, child: detailOD());
-                        //   },
-                        //   flexibleSpace: Container(
-                        //     child: Column(
-                        //       crossAxisAlignment: CrossAxisAlignment.start,
-                        //       children: [
-                        //         text('Sisa Limit: ' + ribuan(dataOd['sisa_limit'], cur: 'Rp '), size: 12),
-                        //         text('Jumlah OD: ' + dataOd['od'].length.toString() + ' Invoice', size: 12),
-                        //       ],
-                        //     ),
-                        //   ),
-                        // ),
+                              // tabController.index == 1 || dataOd == null ? SizedBox.shrink() : loadOD ? ListSkeleton(length: 1,) : SelectInput(
+                              //   space: 15,
+                              //   label: 'Informasi Credit',
+                              //   controller: infoOD,
+                              //   select: (){
+                              //     Wh.dialog(context, child: detailOD());
+                              //   },
+                              //   flexibleSpace: Container(
+                              //     child: Column(
+                              //       crossAxisAlignment: CrossAxisAlignment.start,
+                              //       children: [
+                              //         text('Sisa Limit: ' + ribuan(dataOd['sisa_limit'], cur: 'Rp '), size: 12),
+                              //         text('Jumlah OD: ' + dataOd['od'].length.toString() + ' Invoice', size: 12),
+                              //       ],
+                              //     ),
+                              //   ),
+                              // ),
 
-                        // widget.initData != null ? SizedBox.shrink() : Container(
-                        //   margin: EdgeInsets.only(bottom: 7),
-                        //   child: text('Tipe Kunjungan', bold: true),
-                        // ),
-                        //
-                        // widget.initData != null ? SizedBox.shrink() : Container(
-                        //   margin: EdgeInsets.only(bottom: 15),
-                        //   child: TabBar(
-                        //     unselectedLabelStyle: TextStyle(fontWeight: FontWeight.normal),
-                        //     isScrollable: false,
-                        //     labelPadding: EdgeInsets.zero,
-                        //     indicatorWeight: 2,
-                        //     indicatorColor: Colors.transparent,
-                        //     controller: tabController,
-                        //     tabs: List.generate(dataTipeKunjungan.length, (i){
-                        //       var data = dataTipeKunjungan[i];
-                        //       return Center(
-                        //         child: WidSplash(
-                        //             onTap: (){
-                        //               setState(() {
-                        //                 tabController.index = i;
-                        //                 tipeKunjungan.text = data;
-                        //               });
-                        //             },
-                        //             color: tabController.index == i ? TColor.azure() : Colors.white,
-                        //             padding: EdgeInsets.symmetric(vertical: 10),
-                        //             border: Border(
-                        //                 left: BorderSide(color: tabController.index == i ? TColor.blue(o: .5) : Colors.black12),
-                        //                 top: BorderSide(color: tabController.index == i ? TColor.blue(o: .5) : Colors.black12),
-                        //                 bottom: BorderSide(color: tabController.index == i ? TColor.blue(o: .5) : Colors.black12),
-                        //                 right: BorderSide(color: tabController.index == i ? TColor.blue(o: .5) : Colors.black12)
-                        //             ),
-                        //             child: Container(
-                        //                 width: Mquery.width(context)/dataTipeKunjungan.length,
-                        //                 child: text(data, align: TextAlign.center, color: tabController.index == i ? Colors.white : Colors.black54)
-                        //             )
-                        //         ),
-                        //       );
-                        //     }),
-                        //   ),
-                        // ),
+                              // widget.initData != null ? SizedBox.shrink() : Container(
+                              //   margin: EdgeInsets.only(bottom: 7),
+                              //   child: text('Tipe Kunjungan', bold: true),
+                              // ),
+                              //
+                              // widget.initData != null ? SizedBox.shrink() : Container(
+                              //   margin: EdgeInsets.only(bottom: 15),
+                              //   child: TabBar(
+                              //     unselectedLabelStyle: TextStyle(fontWeight: FontWeight.normal),
+                              //     isScrollable: false,
+                              //     labelPadding: EdgeInsets.zero,
+                              //     indicatorWeight: 2,
+                              //     indicatorColor: Colors.transparent,
+                              //     controller: tabController,
+                              //     tabs: List.generate(dataTipeKunjungan.length, (i){
+                              //       var data = dataTipeKunjungan[i];
+                              //       return Center(
+                              //         child: WidSplash(
+                              //             onTap: (){
+                              //               setState(() {
+                              //                 tabController.index = i;
+                              //                 tipeKunjungan.text = data;
+                              //               });
+                              //             },
+                              //             color: tabController.index == i ? TColor.azure() : Colors.white,
+                              //             padding: EdgeInsets.symmetric(vertical: 10),
+                              //             border: Border(
+                              //                 left: BorderSide(color: tabController.index == i ? TColor.blue(o: .5) : Colors.black12),
+                              //                 top: BorderSide(color: tabController.index == i ? TColor.blue(o: .5) : Colors.black12),
+                              //                 bottom: BorderSide(color: tabController.index == i ? TColor.blue(o: .5) : Colors.black12),
+                              //                 right: BorderSide(color: tabController.index == i ? TColor.blue(o: .5) : Colors.black12)
+                              //             ),
+                              //             child: Container(
+                              //                 width: Mquery.width(context)/dataTipeKunjungan.length,
+                              //                 child: text(data, align: TextAlign.center, color: tabController.index == i ? Colors.white : Colors.black54)
+                              //             )
+                              //         ),
+                              //       );
+                              //     }),
+                              //   ),
+                              // ),
 
-                        // tipeKunjungan.text != 'Efektif' ? tidakEfektif() : efektif()
-                        efektif()
-                      ]
-                  ),
+                              // tipeKunjungan.text != 'Efektif' ? tidakEfektif() : efektif()
+                              efektif()
+                            ]),
+                      ),
+                    ),
+
+                    Container(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                      child: Button(
+                        text: 'Simpan',
+                        onTap: () {
+                          submit();
+                          // if(tipeKunjungan.text == 'Efektif'){
+                          //   submit();
+                          // }else{
+                          //   submitNonEfektif();
+                          // }
+                        },
+                        isSubmit: isSubmit,
+                      ),
+                    )
+
+                    // Container(
+                    //   padding: EdgeInsets.all(15),
+                    //   child: WidSplash(
+                    //     onTap: (){}, radius: BorderRadius.circular(2),
+                    //     color: TColor.azure(),
+                    //     child: Container(
+                    //       width: Mquery.width(context),
+                    //       padding: EdgeInsets.all(13),
+                    //       child: text('Simpan', align: TextAlign.center, color: Colors.white),
+                    //     ),
+                    //   ),
+                    // )
+                  ],
                 ),
               ),
-
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                child: Button(
-                  text: 'Simpan',
-                  onTap: (){
-                    submit();
-                    // if(tipeKunjungan.text == 'Efektif'){
-                    //   submit();
-                    // }else{
-                    //   submitNonEfektif();
-                    // }
-                  },
-                  isSubmit: isSubmit,
-                ),
-              )
-
-              // Container(
-              //   padding: EdgeInsets.all(15),
-              //   child: WidSplash(
-              //     onTap: (){}, radius: BorderRadius.circular(2),
-              //     color: TColor.azure(),
-              //     child: Container(
-              //       width: Mquery.width(context),
-              //       padding: EdgeInsets.all(13),
-              //       child: text('Simpan', align: TextAlign.center, color: Colors.white),
-              //     ),
-              //   ),
-              // )
-            ],
-          ),
-        ),
       ),
     );
   }
 
-  Widget tidakEfektif(){
+  Widget tidakEfektif() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -829,43 +927,63 @@ class _FormPenjualanState extends State<FormPenjualan> with TickerProviderStateM
           margin: EdgeInsets.only(bottom: 7),
           child: text('Status', bold: true),
         ),
-        loadKunjungan ? ListSkeleton(length: 1,) : Container(
-          margin: EdgeInsets.only(bottom: 15),
-          child: TabBar(
-            unselectedLabelStyle: TextStyle(fontWeight: FontWeight.normal),
-            isScrollable: false,
-            labelPadding: EdgeInsets.zero,
-            indicatorWeight: 2,
-            indicatorColor: Colors.transparent,
-            controller: kunjunganController,
-            tabs: List.generate(dataKunjungan.length, (i){
-              var data = dataKunjungan[i];
-              return Center(
-                child: WidSplash(
-                    onTap: (){
-                      setState(() {
-                        kunjunganController.index = i;
-                        listKunjungan.text = data['value'];
-                        print(listKunjungan.text);
-                      });
-                    },
-                    color: listKunjungan.text == data['value'] ? TColor.azure() : Colors.white,
-                    padding: EdgeInsets.symmetric(vertical: 10),
-                    border: Border(
-                        left: BorderSide(color: listKunjungan.text == data['value'] ? TColor.blue(o: .5) : Colors.black12),
-                        top: BorderSide(color: listKunjungan.text == data['value'] ? TColor.blue(o: .5) : Colors.black12),
-                        bottom: BorderSide(color: listKunjungan.text == data['value'] ? TColor.blue(o: .5) : Colors.black12),
-                        right: BorderSide(color: listKunjungan.text == data['value'] ? TColor.blue(o: .5) : Colors.black12)
-                    ),
-                    child: Container(
-                        width: Mquery.width(context)/3,
-                        child: text(data['text'], align: TextAlign.center, color: listKunjungan.text == data['value'] ? Colors.white : Colors.black54)
-                    )
+        loadKunjungan
+            ? ListSkeleton(
+                length: 1,
+              )
+            : Container(
+                margin: EdgeInsets.only(bottom: 15),
+                child: TabBar(
+                  unselectedLabelStyle:
+                      TextStyle(fontWeight: FontWeight.normal),
+                  isScrollable: false,
+                  labelPadding: EdgeInsets.zero,
+                  indicatorWeight: 2,
+                  indicatorColor: Colors.transparent,
+                  controller: kunjunganController,
+                  tabs: List.generate(dataKunjungan.length, (i) {
+                    var data = dataKunjungan[i];
+                    return Center(
+                      child: WidSplash(
+                          onTap: () {
+                            setState(() {
+                              kunjunganController.index = i;
+                              listKunjungan.text = data['value'];
+                              print(listKunjungan.text);
+                            });
+                          },
+                          color: listKunjungan.text == data['value']
+                              ? TColor.azure()
+                              : Colors.white,
+                          padding: EdgeInsets.symmetric(vertical: 10),
+                          border: Border(
+                              left: BorderSide(
+                                  color: listKunjungan.text == data['value']
+                                      ? TColor.blue(o: .5)
+                                      : Colors.black12),
+                              top: BorderSide(
+                                  color: listKunjungan.text == data['value']
+                                      ? TColor.blue(o: .5)
+                                      : Colors.black12),
+                              bottom: BorderSide(
+                                  color: listKunjungan.text == data['value']
+                                      ? TColor.blue(o: .5)
+                                      : Colors.black12),
+                              right: BorderSide(
+                                  color: listKunjungan.text == data['value']
+                                      ? TColor.blue(o: .5)
+                                      : Colors.black12)),
+                          child: Container(
+                              width: Mquery.width(context) / 3,
+                              child: text(data['text'],
+                                  align: TextAlign.center,
+                                  color: listKunjungan.text == data['value']
+                                      ? Colors.white
+                                      : Colors.black54))),
+                    );
+                  }),
                 ),
-              );
-            }),
-          ),
-        ),
+              ),
         TextInput(
           maxLines: 5,
           label: 'Keterangan',
@@ -876,7 +994,7 @@ class _FormPenjualanState extends State<FormPenjualan> with TickerProviderStateM
     );
   }
 
-  Widget efektif(){
+  Widget efektif() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -895,15 +1013,16 @@ class _FormPenjualanState extends State<FormPenjualan> with TickerProviderStateM
           child: Container(
             margin: EdgeInsets.only(bottom: 15),
             child: Wrap(
-              children: List.generate(dataTipeHarga.length, (i){
+              children: List.generate(dataTipeHarga.length, (i) {
                 var data = dataTipeHarga;
                 return Container(
                   margin: EdgeInsets.only(right: 10),
                   child: ChoiceChip(
-                    label: text(data[i].toString().toUpperCase(), color: selected == i ? Colors.white : Colors.black54),
+                    label: text(data[i].toString().toUpperCase(),
+                        color: selected == i ? Colors.white : Colors.black54),
                     selected: selected == i ? true : false,
-                    onSelected: (isSelected){
-                      if(isSelected){
+                    onSelected: (isSelected) {
+                      if (isSelected) {
                         setState(() {
                           selected = i;
                           tipeHarga.text = data[i].toString().toLowerCase();
@@ -1022,18 +1141,19 @@ class _DaftarTokoState extends State<DaftarToko> {
     if (clear) keyword.clear();
 
     setState(() {
-      dataFiltered = dataToko.where((item) =>
+      dataFiltered = dataToko
+          .where((item) =>
               item['nama_toko'].toLowerCase().contains(k) ||
               item['no_acc'].toString().toLowerCase().contains(k) ||
-              item['cust_no'].toString().toLowerCase().contains(k)).toList();
+              item['cust_no'].toString().toLowerCase().contains(k))
+          .toList();
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: Wh.appBar(
-          context,
+      appBar: Wh.appBar(context,
           title: Fc.search(
               hint: 'Ketik nama toko',
               autofocus: true,
@@ -1043,38 +1163,46 @@ class _DaftarTokoState extends State<DaftarToko> {
               }),
           actions: [
             IconButton(
-              icon: Icon(
-                  keyword.text.length > 0 ? Ic.close() : Ic.refresh(),
-                  size: 20,
-                  color: loading ? Colors.black38 : Colors.black54
-              ),
-              onPressed: loading ? null : () {
-                keyword.text.length > 0 ? _filter('', clear: true) : loadDataToko(refill: true);
-              },
+              icon: Icon(keyword.text.length > 0 ? Ic.close() : Ic.refresh(),
+                  size: 20, color: loading ? Colors.black38 : Colors.black54),
+              onPressed: loading
+                  ? null
+                  : () {
+                      keyword.text.length > 0
+                          ? _filter('', clear: true)
+                          : loadDataToko(refill: true);
+                    },
             ),
             IconButton(
               icon: Icon(Ic.info(), size: 20),
               onPressed: () {
-                Wh.toast(dataToko.length == 0 ? 'Tidak ada data toko' : dataToko.length.toString() + ' Toko');
+                Wh.toast(dataToko.length == 0
+                    ? 'Tidak ada data toko'
+                    : dataToko.length.toString() + ' Toko');
               },
             )
-          ]
-      ),
+          ]),
       body: loading
           ? SlideUp(child: ListSkeleton(length: 10))
           : dataFiltered == null || dataFiltered.length == 0
-              ? Wh.noData(message: 'Tidak ada data toko, coba dengan kata kunci lain.')
+              ? Wh.noData(
+                  message: 'Tidak ada data toko, coba dengan kata kunci lain.')
               : new ListView.builder(
                   itemCount: dataFiltered.length,
                   itemBuilder: (context, i) {
                     var data = dataFiltered[i];
                     var noAcc = data['no_acc'] == null ? '' : data['no_acc'];
-                    var custNo = data['cust_no'] == null ? '' : ' - ' + data['cust_no'];
+                    var custNo =
+                        data['cust_no'] == null ? '' : ' - ' + data['cust_no'];
 
                     return WidSplash(
                       color: i % 2 == 0 ? TColor.silver() : Colors.white,
                       onTap: () {
-                        Navigator.of(context).pop({'toko': data['nama_toko'], 'id': data['id'], 'tipe_harga': data['tipe_harga']});
+                        Navigator.of(context).pop({
+                          'toko': data['nama_toko'],
+                          'id': data['id'],
+                          'tipe_harga': data['tipe_harga']
+                        });
                       },
                       child: Container(
                         padding: EdgeInsets.all(15),
@@ -1084,9 +1212,21 @@ class _DaftarTokoState extends State<DaftarToko> {
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: <Widget>[
-                                noAcc == '' ? SizedBox.shrink() : text('[' + noAcc + '' + custNo + ']', color: TColor.black()),
-                                text(data['nama_toko'].toString().toUpperCase(), bold: true, color: data['id_mitra'] == null || data['id_mitra'].toString() == '0' ? TColor.black() : TColor.blueLight()),
-                                text(data['alamat'].toString().toUpperCase(), color: data['id_mitra'] == null || data['id_mitra'].toString() == '0' ? TColor.black() : TColor.blueLight()),
+                                noAcc == ''
+                                    ? SizedBox.shrink()
+                                    : text('[' + noAcc + '' + custNo + ']',
+                                        color: TColor.black()),
+                                text(data['nama_toko'].toString().toUpperCase(),
+                                    bold: true,
+                                    color: data['id_mitra'] == null ||
+                                            data['id_mitra'].toString() == '0'
+                                        ? TColor.black()
+                                        : TColor.blueLight()),
+                                text(data['alamat'].toString().toUpperCase(),
+                                    color: data['id_mitra'] == null ||
+                                            data['id_mitra'].toString() == '0'
+                                        ? TColor.black()
+                                        : TColor.blueLight()),
                               ],
                             ),
                           ],
