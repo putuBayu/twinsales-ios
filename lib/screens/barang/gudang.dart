@@ -11,7 +11,7 @@ class Gudang extends StatefulWidget {
 }
 
 class _GudangState extends State<Gudang> {
-
+  var test = false;
   var gudang = [], filter = [], loading = true, keyword = TextEditingController();
 
   getDataGudang({refill: false}) async {

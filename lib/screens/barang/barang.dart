@@ -21,6 +21,7 @@ class _BarangState extends State<Barang> {
   var keyword = new TextEditingController();
   var totalRows = 0, tempTotal = 0, perPage = 25, currentPage = 1, viewBy = '*';
   String apii = '', barcode = '';
+  String testcode = 'lalala';
 
   // get data barang
   getData({refill: false}) async {
